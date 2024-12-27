@@ -1,0 +1,42 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    icalendar (2.10.3)
+      ice_cube (~> 0.16)
+      ostruct
+    ice_cube (0.17.0)
+    nokogiri (1.18.0-aarch64-linux-gnu)
+      racc (~> 1.4)
+    nokogiri (1.18.0-aarch64-linux-musl)
+      racc (~> 1.4)
+    nokogiri (1.18.0-arm-linux-gnu)
+      racc (~> 1.4)
+    nokogiri (1.18.0-arm-linux-musl)
+      racc (~> 1.4)
+    nokogiri (1.18.0-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.18.0-x86_64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.18.0-x86_64-linux-gnu)
+      racc (~> 1.4)
+    nokogiri (1.18.0-x86_64-linux-musl)
+      racc (~> 1.4)
+    ostruct (0.6.1)
+    racc (1.8.1)
+
+PLATFORMS
+  aarch64-linux-gnu
+  aarch64-linux-musl
+  arm-linux-gnu
+  arm-linux-musl
+  arm64-darwin
+  x86_64-darwin
+  x86_64-linux-gnu
+  x86_64-linux-musl
+
+DEPENDENCIES
+  icalendar
+  nokogiri
+
+BUNDLED WITH
+   2.5.15
