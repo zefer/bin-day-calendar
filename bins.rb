@@ -32,6 +32,7 @@ class Bins
            end
 
     collections = parse_html_to_collections(body)
+    collections = add_calendar_end_event(collections)
     calendar = collections_to_calendar(collections)
     File.open('bins.ics', 'w') { |f| f.write(calendar.to_ical) }
   end
@@ -50,6 +51,11 @@ class Bins
     end
 
     cal
+  end
+
+  def add_calendar_end_event(collections)
+    collections[collections.keys.last] << "⚠️ End of Bin Calendar"
+    collections
   end
 
   def parse_html_to_collections(html)
