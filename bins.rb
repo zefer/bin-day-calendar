@@ -5,9 +5,6 @@ require 'nokogiri'
 require 'pry'
 require 'icalendar'
 
-# Take the HTML from the Cumberland bin calendar and parse it into an ICS file
-# which can be imported into a calendar.
-# https://selfservice-cumberland.servicebuilder.co.uk/renderform?t=25&k=E43CEB1FB59F859833EF2D52B16F3F4EBE1CAB6A
 class Bins
   TYPES = {
     'Refuse' => '🗑 Black',
@@ -17,11 +14,10 @@ class Bins
   }.freeze
 
   def initialize
-    @session_id = ENV.fetch('COOKIE_ASPNET_SESSION_ID')
-    @cookie_verification_token = ENV.fetch('COOKIE_VERIFICATION_TOKEN')
-    @header_verification_token = ENV.fetch('HEADER_REQUEST_VERIFICATION_TOKEN')
-    @form_post_code = ENV.fetch('FORM_POST_CODE')
-    @form_selection_id = ENV.fetch('FORM_SELECTION_ID')
+    # Visit the URL below, enter your postcode, copy the ID from the end of the
+    # resulting URL (e.g. 10000123456).
+    # https://www.cumberland.gov.uk/bins-recycling-and-street-cleaning/waste-collections/bin-collection-schedule
+    @address_id = ENV.fetch('ADDRESS_ID')
   end
 
   def run(from_cache: false)
@@ -62,11 +58,10 @@ class Bins
     collections = {}
     doc = Nokogiri::HTML(html, nil, 'UTF-8')
 
-    doc.css('.resirow').each do |row|
-      icon = row.css('.col')[0]
-      date = Date.parse(row.css('.col')[1].text.strip)
+    doc.css('.waste-collection__day').each do |row|
+      date = Date.parse(row.css('time')[0].attributes['datetime'].value)
       collections[date] ||= []
-      type = (icon.attribute('class').value.split(' ') & TYPES.keys).first
+      type = row.css('.waste-collection__day--colour')[0].inner_html.strip
 
       collections[date] << TYPES[type]
     end
@@ -75,25 +70,10 @@ class Bins
   end
 
   def fetch_bins
-    uri = URI('https://selfservice-cumberland.servicebuilder.co.uk/renderform/Form')
+    uri = URI("https://www.cumberland.gov.uk/bins-recycling-and-street-cleaning/waste-collections/bin-collection-schedule/view/#{@address_id}")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
-
-    cookie = "ASP.NET_SessionId=#{@session_id}; __RequestVerificationToken=#{@cookie_verification_token}"
-
-    request = Net::HTTP::Post.new(uri)
-    request['Cookie'] = cookie
-    request.set_form_data(
-      '__RequestVerificationToken': @header_verification_token,
-      'FormGuid': '0762556a-22bf-4899-b80d-ef0ea01a444f',
-      'ObjectTemplateID': '25',
-      'Trigger': 'submit',
-      'CurrentSectionID': @form_selection_id.to_s,
-      'TriggerCtl': '',
-      'FF265': 'U10000884980',
-      'FF265lbltxt': 'Please select your address',
-      'FF265-text': @form_post_code
-    )
+    request = Net::HTTP::Get.new(uri)
 
     http.request(request)
   end
