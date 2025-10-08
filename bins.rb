@@ -50,7 +50,7 @@ class Bins
   end
 
   def add_calendar_end_event(collections)
-    collections[collections.keys.last] << "⚠️ End of Bin Calendar"
+    collections[collections.keys.last].unshift("⚠️ End of Bin Calendar")
     collections
   end
 
