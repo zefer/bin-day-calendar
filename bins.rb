@@ -73,6 +73,9 @@ class Bins
     uri = URI("https://www.cumberland.gov.uk/bins-recycling-and-street-cleaning/waste-collections/bin-collection-schedule/view/#{@address_id}")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
+    # Work-around server-side SSL configuration issue. This can be removed in
+    # the future if the SSL configuration is fixed on the Cumberland website.
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     request = Net::HTTP::Get.new(uri)
 
     http.request(request)
